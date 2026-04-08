@@ -251,8 +251,15 @@
         }
 
         function useNote(text) {
-            document.getElementById('text-input').value = text;
-            document.getElementById('text-input').focus();
+            // Set the text in the message textarea
+            const textInput = document.getElementById('text-input');
+            textInput.value = text;
+            
+            // Focus on the textarea
+            textInput.focus();
+            
+            // Scroll to the textarea
+            textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         // Initial render
