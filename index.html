@@ -42,6 +42,10 @@
         .right-row .delete-btn { left: -35px; }
         .timestamp-row .delete-btn { right: 10px; top: 50%; }
 
+        /* Note styles */
+        .note-item { background: #2c2c2e; border-radius: 8px; padding: 8px; margin-bottom: 8px; font-size: 12px; position: relative; }
+        .note-delete { position: absolute; top: 4px; right: 4px; color: #ff453a; cursor: pointer; }
+
         @media print { .no-print { display: none; } }
     </style>
 </head>
@@ -90,7 +94,7 @@
         </div>
     </footer>
 
-    <div id="admin-panel" class="no-print fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#1c1c1e] p-5 border-t-2 border-blue-600 rounded-t-2xl z-30 transform translate-y-full transition-transform duration-300">
+    <div id="admin-panel" class="no-print fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#1c1c1e] p-5 border-t-2 border-blue-600 rounded-t-2xl z-30 transform translate-y-full transition-transform duration-300 overflow-y-auto max-h-[80vh]">
         <div class="flex justify-between items-center mb-4">
             <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Editor Panel</span>
             <button onclick="toggleAdmin()" class="text-[10px] bg-gray-700 px-3 py-1 rounded-full text-white">Hide</button>
@@ -111,11 +115,24 @@
         </div>
 
         <textarea id="text-input" placeholder="Type message..." rows="2" class="w-full bg-black text-sm p-3 rounded-lg border border-gray-800 outline-none mb-4"></textarea>
-        <button onclick="addMessage()" class="w-full bg-blue-600 py-3 rounded-xl font-bold text-sm">Add Item</button>
+        <button onclick="addMessage()" class="w-full bg-blue-600 py-3 rounded-xl font-bold text-sm mb-6">Add Item</button>
+
+        <!-- Notes Section -->
+        <div class="border-t border-gray-800 pt-4 mt-2">
+            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-3">Notes / Quick Text</span>
+            <div class="flex space-x-2 mb-3">
+                <input type="text" id="note-input" placeholder="Quick note..." class="flex-1 bg-black text-xs p-2.5 rounded-lg border border-gray-800 outline-none">
+                <button onclick="addNote()" class="bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Save</button>
+            </div>
+            <div id="notes-list" class="space-y-2">
+                <!-- Notes will appear here -->
+            </div>
+        </div>
     </div>
 
     <script>
         let selectedChatImage = null;
+        let notes = JSON.parse(localStorage.getItem('messenger_notes') || '[]');
 
         function toggleAdmin() {
             const panel = document.getElementById('admin-panel');
@@ -200,6 +217,43 @@
             document.getElementById('chat-image-input').value = "";
             chatArea.scrollTop = chatArea.scrollHeight;
         }
+
+        // Notes Functions
+        function renderNotes() {
+            const list = document.getElementById('notes-list');
+            list.innerHTML = '';
+            notes.forEach((note, index) => {
+                const div = document.createElement('div');
+                div.className = 'note-item group cursor-pointer hover:bg-gray-700 transition-colors';
+                div.innerHTML = `
+                    <div onclick="useNote('${note.replace(/'/g, "\\'")}')">${note}</div>
+                    <span onclick="deleteNote(${index})" class="note-delete">✕</span>
+                `;
+                list.appendChild(div);
+            });
+            localStorage.setItem('messenger_notes', JSON.stringify(notes));
+        }
+
+        function addNote() {
+            const input = document.getElementById('note-input');
+            if (input.value.trim()) {
+                notes.push(input.value.trim());
+                input.value = '';
+                renderNotes();
+            }
+        }
+
+        function deleteNote(index) {
+            notes.splice(index, 1);
+            renderNotes();
+        }
+
+        function useNote(text) {
+            document.getElementById('text-input').value = text;
+        }
+
+        // Initial render
+        renderNotes();
     </script>
 </body>
 </html>
