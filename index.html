@@ -120,11 +120,11 @@
         <!-- Notes Section -->
         <div class="border-t border-gray-800 pt-4 mt-2">
             <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-3">Notes / Quick Text</span>
-            <div class="flex space-x-2 mb-3">
-                <input type="text" id="note-input" placeholder="Quick note..." class="flex-1 bg-black text-xs p-2.5 rounded-lg border border-gray-800 outline-none">
-                <button onclick="addNote()" class="bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Save</button>
+            <div class="flex flex-col space-y-2 mb-3">
+                <textarea id="note-input" placeholder="Quick note..." rows="3" class="w-full bg-black text-xs p-2.5 rounded-lg border border-gray-800 outline-none resize-none"></textarea>
+                <button onclick="addNote()" class="w-full bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Save Note</button>
             </div>
-            <div id="notes-list" class="space-y-2">
+            <div id="notes-list" class="space-y-2 max-h-48 overflow-y-auto">
                 <!-- Notes will appear here -->
             </div>
         </div>
@@ -225,8 +225,10 @@
             notes.forEach((note, index) => {
                 const div = document.createElement('div');
                 div.className = 'note-item group cursor-pointer hover:bg-gray-700 transition-colors';
+                const displayText = note.replace(/\n/g, '<br>');
+                const escapedNote = note.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
                 div.innerHTML = `
-                    <div onclick="useNote('${note.replace(/'/g, "\\'")}')">${note}</div>
+                    <div onclick="useNote(${JSON.stringify(note)})" class="text-xs whitespace-pre-wrap break-words">${displayText}</div>
                     <span onclick="deleteNote(${index})" class="note-delete">✕</span>
                 `;
                 list.appendChild(div);
@@ -250,6 +252,7 @@
 
         function useNote(text) {
             document.getElementById('text-input').value = text;
+            document.getElementById('text-input').focus();
         }
 
         // Initial render
