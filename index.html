@@ -42,9 +42,7 @@
         .right-row .delete-btn { left: -35px; }
         .timestamp-row .delete-btn { right: 10px; top: 50%; }
 
-        /* Note styles */
-        .note-item { background: #2c2c2e; border-radius: 8px; padding: 8px; margin-bottom: 8px; font-size: 12px; position: relative; }
-        .note-delete { position: absolute; top: 4px; right: 4px; color: #ff453a; cursor: pointer; }
+
 
         @media print { .no-print { display: none; } }
     </style>
@@ -117,22 +115,11 @@
         <textarea id="text-input" placeholder="Type message..." rows="2" class="w-full bg-black text-sm p-3 rounded-lg border border-gray-800 outline-none mb-4"></textarea>
         <button onclick="addMessage()" class="w-full bg-blue-600 py-3 rounded-xl font-bold text-sm mb-6">Add Item</button>
 
-        <!-- Notes Section -->
-        <div class="border-t border-gray-800 pt-4 mt-2">
-            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-3">Notes / Quick Text</span>
-            <div class="flex flex-col space-y-2 mb-3">
-                <textarea id="note-input" placeholder="Quick note..." rows="3" class="w-full bg-black text-xs p-2.5 rounded-lg border border-gray-800 outline-none resize-none"></textarea>
-                <button onclick="addNote()" class="w-full bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">Save Note</button>
-            </div>
-            <div id="notes-list" class="space-y-2 max-h-48 overflow-y-auto">
-                <!-- Notes will appear here -->
-            </div>
-        </div>
+
     </div>
 
     <script>
         let selectedChatImage = null;
-        let notes = JSON.parse(localStorage.getItem('messenger_notes') || '[]');
 
         function toggleAdmin() {
             const panel = document.getElementById('admin-panel');
@@ -217,53 +204,6 @@
             document.getElementById('chat-image-input').value = "";
             chatArea.scrollTop = chatArea.scrollHeight;
         }
-
-        // Notes Functions
-        function renderNotes() {
-            const list = document.getElementById('notes-list');
-            list.innerHTML = '';
-            notes.forEach((note, index) => {
-                const div = document.createElement('div');
-                div.className = 'note-item group cursor-pointer hover:bg-gray-700 transition-colors';
-                const displayText = note.replace(/\n/g, '<br>');
-                const escapedNote = note.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
-                div.innerHTML = `
-                    <div onclick="useNote(${JSON.stringify(note)})" class="text-xs whitespace-pre-wrap break-words">${displayText}</div>
-                    <span onclick="deleteNote(${index})" class="note-delete">✕</span>
-                `;
-                list.appendChild(div);
-            });
-            localStorage.setItem('messenger_notes', JSON.stringify(notes));
-        }
-
-        function addNote() {
-            const input = document.getElementById('note-input');
-            if (input.value.trim()) {
-                notes.push(input.value.trim());
-                input.value = '';
-                renderNotes();
-            }
-        }
-
-        function deleteNote(index) {
-            notes.splice(index, 1);
-            renderNotes();
-        }
-
-        function useNote(text) {
-            // Set the text in the message textarea
-            const textInput = document.getElementById('text-input');
-            textInput.value = text;
-            
-            // Focus on the textarea
-            textInput.focus();
-            
-            // Scroll to the textarea
-            textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        // Initial render
-        renderNotes();
     </script>
 </body>
 </html>
